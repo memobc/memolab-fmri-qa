@@ -1,0 +1,6 @@
+# Ignore matlab temporary files
+*.m~
+
+# Ignore anything in vendor folder
+vendor
+vendor/*
