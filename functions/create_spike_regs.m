@@ -52,7 +52,8 @@ for j = 1:length(b.runs)
     numBad(j) = (100*length(bad_timepoints)/size(motion,1));
     
     % write out list of bad timepoints
-    filename = fullfile(b.dataDir, b.runs{j}, [spikePrefix 'bad_timepoints.txt']);
+    filedir  = fullfile(b.dataDir, 'func');
+    filename = fullfile(filedir, [spikePrefix 'bad_timepoints' b.runs{j} '.txt']);
     fprintf('-- Writing out %s\n', filename);
     dlmwrite(filename, bad_timepoints, 'delimiter', '\t');
    
@@ -70,7 +71,7 @@ for j = 1:length(b.runs)
     allreg = [motion spikereg];
     
     % write out new rp regressors including spike regs
-    filename = fullfile(b.dataDir, b.runs{j}, [spikePrefix 'spike_regs_rp.txt']);
+    filename = fullfile(filedir, [spikePrefix 'spike_regs_rp' b.runs{j} '.txt']);
     fprintf('-- Writing out %s\n\n', filename);
     dlmwrite(filename, allreg, 'delimiter', '\t');
     

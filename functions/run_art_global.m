@@ -65,7 +65,7 @@ FD_run       = cell(1,length(b.rundir));
 % Check if ArtRepair was already run and if so, whether it should be run
 % again
 runflag = 1;
-if size(spm_select('fplist',fullfile(b.dataDir, b.runs{1}), '^art'), 1) > 0 % check only for first run
+if size(spm_select('FPlistRec', b.dataDir, '^art'), 1) > 0
     if b.auto_accept
         response = 'n';
     else
