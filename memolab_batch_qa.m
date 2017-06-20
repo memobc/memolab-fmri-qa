@@ -33,7 +33,7 @@ voxsize     = 3.0;
 % QAdir     = Name of output QA directory
 
 dataDir     = '/path/to/data';
-scriptdir   = '/path/to/memolab_MRI_qa';
+scriptdir   = fileparts(mfilename('fullpath'));
 QAdir       = 'Name_of_QA_Directory';
 
 %-- Info for Subjects
@@ -235,7 +235,7 @@ for i = 1:length(subjects)
     % Run art_global
     fprintf('--Running Art Global--\n')
     [all_suspects, FD_mean_run, FD_run] = run_art_global(b);
-    b.mask = fullfile(b.dataDir, b.runs{1}, 'ArtifactMask.nii');
+    b.mask = spm_select('ExtFPListRec', b.dataDir, 'ArtifactMask.nii', 1);
     fprintf('------------------------------------------------------------\n')
     fprintf('\n')
    

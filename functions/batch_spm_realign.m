@@ -47,7 +47,7 @@ function [b] = batch_spm_realign(b)
 % Check if realignment was already run and if so, whether it should be run
 % again
 runflag = 1;
-if size(spm_select('FPList', fullfile(b.dataDir, b.runs{1}), '^rp'), 1) > 0 % check only for first run
+if size(spm_select('FPListRec', b.dataDir, ['^rp.*' b.runs{1} '.*\.txt']), 1) > 0 % check only for first run
     if b.auto_accept
         response = 'n';
     else
@@ -78,11 +78,10 @@ if runflag
 end
 
 % Get file information for each run & store for future use
-b.meanfunc = spm_select('FPList', fullfile(b.dataDir, b.runs{1}), '^mean.*\.nii'); % mean func is written only for first run
+b.meanfunc = spm_select('FPListRec', b.dataDir, ['^mean.*' b.runs{1} '.*\.nii']); % mean func is written only for first run
 for i = 1:length(b.runs)
-    tmp = spm_select('FPList', fullfile(b.dataDir, b.runs{i}), '^rp');
-    b.rundir(i).rp = tmp(1,:);
-    b.rundir(i).rfiles = spm_select('ExtFPList', fullfile(b.dataDir, b.runs{i}), '^r.*\.nii');
+    b.rundir(i).rp     = spm_select('FPListRec', b.dataDir, ['^rp.*' b.runs{i} '.*\.txt']);
+    b.rundir(i).rfiles = spm_select('ExtFPListRec', b.dataDir, ['^r.*'  b.runs{i} '.*\.nii']);
     fprintf('%0.0f: Realignment parameters file: %s\n', i, b.rundir(i).rp);
 end
 

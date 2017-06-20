@@ -36,12 +36,12 @@ for irun = 1:length(b.runs)
     
     % Select this run's full nii timeseries
     rundir   = fullfile(b.dataDir, b.runs{irun});
-    wildcard = [ '^' b.rawdataFP '.*\.nii'];
-    b.rundir(irun).files = spm_select('ExtFPList', rundir, wildcard, Inf);
+    wildcard = [ '^' b.curSubj '.*' b.runs{irun} '.*\.nii'];
+    b.rundir(irun).files = spm_select('ExtFPListRec', b.dataDir, wildcard, Inf);
     
     % Check if files are found
     if size(b.rundir(irun).files, 1) > 0
-        fprintf('In directory %s:\n%0.0f nii files found.\n', rundir, size(b.rundir(irun).files, 1));
+        fprintf('%0.0f nii files found.\n', size(b.rundir(irun).files, 1));
     else
         % Check for gz file that matches prefix
         gzfiletest = dir([rundir filesep b.rawdataFP '*nii.gz']);
