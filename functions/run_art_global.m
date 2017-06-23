@@ -32,8 +32,7 @@ function [all_suspects, FD_mean_run, FD_run] = run_art_global(b)
 %                               parameters as estimated by SPM's
 %                               realignment routine
 %
-%       b.runs        = cellstring with the name of the directories containing
-%                       each functional run.
+%       b.runs        = cellstring with IDs for each functional time series
 %
 %       b.headMask    = art_global's mask flag, see art_global,
 %                       memolab_batch_qa
@@ -90,11 +89,21 @@ end
 % Run Art Global for each run
 if runflag
     for r = 1:length(b.rundir)
-        fprintf('%s (%d / %d runs)\n', b.runs{r}, r, length(b.rundir))
+        
+        fprintf('%s (%d / %d runs)\n\n', b.runs{r}, r, length(b.rundir))
         [art_suspects, FD_mean_run{r}, FD_run{r}] = art_global_qa(b.rundir(r).files, b.rundir(r).rp, b.headMask, b.repairType, b.percent, b.mv);
         fprintf('------------------------------------------------------------\n')
         fprintf('\n')
         all_suspects{r} = art_suspects;
+        
+        %-- Give this run's Art Global files unique filenames
+
+        % ArtifactMask
+        give_unique_filename('ArtifactMask.nii', b, r);
+
+        % art_suspects
+        give_unique_filename('art_suspects.txt', b, r);
+        
     end
 end
 
@@ -106,6 +115,27 @@ end
 if runflag
     fprintf('--Moving Art Global figures...--\n')
     movefile(fullfile(b.dataDir, 'artglobal*.jpg'), fullfile(b.dataDir, b.QAdir))
+end
+
+%====================================================================================
+%                      Sub Functions
+%====================================================================================
+
+function give_unique_filename(filename, b, rr)
+    % Subfunction designed to give the art file "file" a unique filename
+    % using the information in the batch structure "b".
+    %
+    % ArtifactMask.nii --> ArtifactMask_sub-001_encoding_run-001.nii
+    %
+    % Written by Kyle Kurkela, kyleakurkela@gmail.com
+
+    [~, FN, ext]   = fileparts(filename);
+    og_file        = spm_select('FPListRec', b.dataDir, filename);
+    og_dir         = fileparts(og_file);
+    rename         = fullfile(og_dir, [FN '_' b.curSubj '_' b.runs{rr} ext]);
+    fprintf('Renaming %s --> \n\t %s\n\n', og_file, rename)
+    movefile(og_file, rename) % rename
+
 end
 
 end

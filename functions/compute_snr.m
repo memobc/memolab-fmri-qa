@@ -98,7 +98,7 @@ for j = 1:length(b.runs)
     snr(snr>2000)   = NaN; % mask out abnormal values
     snr(snr==0)     = NaN;
     snrmean         = [snrmean nanmean(nanmean(nanmean(snr(:,:,:))))];
-    snrmean_mid     = [snrmean_mid nanmean(nanmean(snr(:,:,(size(data,3)/2))))];
+    snrmean_mid     = [snrmean_mid nanmean(nanmean(snr(:,:,(ceil(size(data,3)/2)))))];
     snr(isnan(snr)) = 0;
     
     %output files to the QA dir
@@ -190,12 +190,13 @@ save_figs(s, 'tsnr_plot', b, figFormat, pdfReport, 6, 6); % square plot
 % % Plot spatial SNR
 figure(sp)
 maxrunlen = size(spatial_SNR, 2);
-colors = {'r','g','b','k','y','m','c'};
+%colors = {'r','g','b','k','y','m','c'};
+colors = num2cell(hsv(size(spatial_SNR_runs,2)), 2);
 for j = 1:size(spatial_SNR_runs,2) % coded this way in case runs have different lengths
     if size(spatial_SNR_runs{j}, 2) > maxrunlen
         maxrunlen = size(spatial_SNR_runs{j}, 2);
     end
-    plot(spatial_SNR_runs{j}, colors{(mod(j-1,length(colors))+1)}); % cycle through colors
+    plot(spatial_SNR_runs{j}, 'Color', colors{(mod(j-1,length(colors))+1)}); % cycle through colors
     hold on
 end
 hold off

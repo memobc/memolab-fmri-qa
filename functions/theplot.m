@@ -70,6 +70,14 @@ if ~exist(outdir, 'dir')
     mkdir(outdir)
 end
 
+% Does the fd vector match the length of the bold time series?
+if size(bold_image,1) ~= length(fd)
+    fprintf('\nImage Frames:\n\n')
+    disp(bold_image)
+    fprintf('\nLength of the FD vector: %0.0f\n\n', length(fd))
+    assert(size(bold_image,1) == length(fd), 'The number of bold image frames does NOT match the number of framewise displacement values. See above.')
+end
+
 %====================================================================================
 %			Step 2: Load, mask, and manipluate various images
 %====================================================================================

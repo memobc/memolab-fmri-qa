@@ -17,7 +17,7 @@ function run_theplot(b, FD_run)
 %                    SPM's realignment procedure
 %
 %       b.dataDir  = fullpath string to the directory where the functional MRI data
-%                   is being stored
+%                    is being stored
 %
 %       b.QAdir    = string, name of the directory where QA output is stored
 %
@@ -25,10 +25,9 @@ function run_theplot(b, FD_run)
 %                    runs, with the fields:
 %
 %           b.rundir(n).rfiles = full path to run n's realigned 
-%                                and resliced bold_nii time series
+%                                and resliced bold nii time series
 %
-%       b.runs    = cellstring with the name of the directories containing
-%                   each functional run.
+%       b.runs    = cellstring with IDs for each functional time series
 %
 %   FD_run = a cell array containing vectors of the framewise displacement
 %            values for each timepoint in all functional runs, where 
@@ -47,7 +46,7 @@ function run_theplot(b, FD_run)
        isempty(spm_select('FPList', segDir, '^c2')) || ...
        isempty(spm_select('FPList', segDir, '^c3'))
         
-        fprintf('--Segmentation has not yet been run. Running segmentation...--\n')
+        fprintf('--Segmentation of the mean func has not yet been run. Running segmentation...--\n')
         newsegment(b.meanfunc);
         fprintf('------------------------------------------------------------\n')
         fprintf('\n')
@@ -62,7 +61,7 @@ function run_theplot(b, FD_run)
     
     % For each run...
     for r = 1:length(b.rundir)
-        fprintf('%s (%d / %d runs)\n', b.runs{r}, r, length(b.rundir))
+        fprintf('\n%s (%d / %d runs)\n', b.runs{r}, r, length(b.rundir))
         theplot(b.meanfunc, b.rundir(r).rfiles, full_path_to_QAdir, FD_run{r}, b.runs{r})
         fprintf('------------------------------------------------------------\n')
         fprintf('\n')

@@ -18,13 +18,7 @@ function [] = memolab_batch_qa()
 % SPM). 'DCM' or 'NII'. Note: this QA routine is NOT compatible with
 % .img/.hdr. Please convert .img/.hdr to .nii prior to running routine.
 
-fileType          = 'NII';
-rawdataFilePrefix = 'prefix';
-
-%-- Voxel Size
-% Voxel size in mm
-
-voxsize     = 3.0;
+fileType    = 'NII';
 
 %-- Directory Information
 % Paths to relevant directories.
@@ -32,19 +26,28 @@ voxsize     = 3.0;
 % scriptdir = path to directory housing this script (and auxiliary scripts)
 % QAdir     = Name of output QA directory
 
-dataDir     = '/path/to/data';
-scriptdir   = fileparts(mfilename('fullpath'));
-QAdir       = 'Name_of_QA_Directory';
+dataDir     = '/fullpath/to/the/data';
+scriptdir   = '/fullpath/to/this/script'; % fileparts(mfilename('fullpath'));
+QAdir       = 'QA';
 
 %-- Info for Subjects
 % Subject-specific information.
 % subjects  = cellstring containing the subject IDs
-% runs      = cellstring containg the run folders for each subject.
-% Assumes that files are organized into separate folders for each run,
-% which are nested in a subject folder, e.g., /path/to/data/sub001/run001
+% runs      = cellstring containg the IDs for each BOLD time series
+%
+% Assumes that all files have unique filenames that can be identified with
+% a combination of the cell strings above. For example, bold files NEED to
+% look something like:
+%   /dataDir/sub-001/func/sub-001_encoding_run-001_bold.nii
+%   /dataDir/sub-001/func/sub-001_encoding_run-002_bold.nii
+%   /dataDir/sub-001/func/sub-001_retrieval_run-001_bold.nii
+%   /dataDir/sub-001/func/sub-001_retrieval_run-002_bold.nii
+%
+%  See BIDS format
 
-subjects    = {'sub001'};
-runs        = {'run001'};
+subjects    = {'sub-001'};
+runs        = {'encoding_run-01' 'encoding_run-02' ...
+               'retrieval_run01' 'retrieval_run02'};
 
 %-- Figure Format
 % Format figures should be saved in. Options: '-pdf' or '-png'
@@ -85,7 +88,7 @@ RepairType 	 = 0;
 %-- Prefix for Spike Regressor File.
 % Note: can be empty, i.e. ''
 
-spikePrefix = 'demo_';
+spikePrefix = '';
 
 %-- Auto-accept
 % Do you want to run all the way through without asking for user input?
@@ -142,7 +145,7 @@ end
 if runtheplot % voxplot specific requirements
     % hline/vline
     if exist('vline', 'file') == 0
-        error('hline and vline must be on the path')
+        error('hline and vline must be on the path.')
     end
 end
 
@@ -155,14 +158,12 @@ for i = 1:length(subjects)
     b.curSubj   = subjects{i};
     b.runs      = runs;
     b.dataDir   = fullfile(dataDir, b.curSubj);
-    b.rawdataFP = rawdataFilePrefix;
     
     %%% Alternatively, if there is an initializeVars script set up, call that
     %%% see https://github.com/ritcheym/fmri_misc/tree/master/batch_system    
     %     b = initializeVars(subjects,i);
     
     % Define variables for individual subjects - QA General
-    b.voxsize     = voxsize;
     b.scriptdir   = scriptdir;
     b.QAdir       = QAdir;
     b.auto_accept = auto_accept;
@@ -235,12 +236,13 @@ for i = 1:length(subjects)
     % Run art_global
     fprintf('--Running Art Global--\n')
     [all_suspects, FD_mean_run, FD_run] = run_art_global(b);
-    b.mask = spm_select('ExtFPListRec', b.dataDir, 'ArtifactMask.nii', 1);
     fprintf('------------------------------------------------------------\n')
     fprintf('\n')
    
     % Calculate temporal SNR & plot intensity changes
     fprintf('--SNR & Intensity Calculations--\n')
+    art_automask(b.meanfunc, -1, 1);
+    b.mask = spm_select('ExtFPListRec', b.dataDir, 'ArtifactMask.nii', 1);
     [b, snrmean, snrmean_mid, spatialsnr_mean] = compute_snr(b, figFormat, pdfReport);
     fprintf('------------------------------------------------------------\n')
     fprintf('\n')
