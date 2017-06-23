@@ -10,8 +10,7 @@ function [b] = find_nii(b)
 %
 %	b = memolab qa batch structure containing the fields:
 %
-%       b.runs      = cellstring with the name of the directories containing
-%                     each functional run
+%       b.runs      = cellstring with IDs for each functional time series
 %
 %       b.dataDir   = fullpath string to the directory where the functional MRI data
 %                     is being stored
@@ -34,28 +33,27 @@ function [b] = find_nii(b)
 
 for irun = 1:length(b.runs)
     
-    % Select this run's full nii timeseries
-    rundir   = fullfile(b.dataDir, b.runs{irun});
-    wildcard = [ '^' b.curSubj '.*' b.runs{irun} '.*\.nii'];
-    b.rundir(irun).files = spm_select('ExtFPListRec', b.dataDir, wildcard, Inf);
+    % Select this run's full nii timeseries using a regular expression
+    regularExp           = [ '^' b.curSubj '.*' b.runs{irun} '.*bold\.nii$'];
+    b.rundir(irun).files = spm_select('ExtFPListRec', b.dataDir, regularExp, Inf);
     
     % Check if files are found
     if size(b.rundir(irun).files, 1) > 0
         fprintf('%0.0f nii files found.\n', size(b.rundir(irun).files, 1));
     else
-        % Check for gz file that matches prefix
-        gzfiletest = dir([rundir filesep b.rawdataFP '*nii.gz']);
-        if length(gzfiletest)==1
-            fprintf('Did not find nii files. Unzipping gz file for SPM: %s\n',gzfiletest.name);
-            gunzip([rundir filesep gzfiletest.name]);
-            b.rundir(irun).files = spm_select('ExtFPList', rundir, wildcard, Inf);
-        elseif length(gzfiletest)>1
-            fprintf('Found more than one matching gz files and not sure what to do.\n');
+        % Check for a .gz file that matches the regular expression
+        gzfiletestExp = [ '^' b.curSubj '.*' b.runs{irun} '.*bold\.nii\.gz$'];
+        gzfile        = spm_select('FPListRec', b.dataDir, gzfiletestExp);
+        
+        if ~isempty(gzfile)
+            fprintf('Did not find nii files. Unzipping gz files for SPM:\n');
+            disp(gzfile)
+            gunzip(gzfile)
+            b.rundir(irun).files = spm_select('ExtFPListRec', b.dataDir, regularExp, Inf);
         else
             error('No nii or matching gz files found.\n');
         end
     end
-
     
 end
 
