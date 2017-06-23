@@ -9,8 +9,8 @@ function [] = save_sum_info(b, FD_mean_run, FD_run, snrmean, snrmean_mid, spatia
 %
 %       b = memolab qa batch structure containing the fields:
 %
-%           b.runs      = cellstring with the name of the directories containing
-%                         each functional run
+%           b.runs      = cellstring with IDs for each functional time
+%                         series
 %
 %           b.curSubj   = string, the ID for the current subject
 %
