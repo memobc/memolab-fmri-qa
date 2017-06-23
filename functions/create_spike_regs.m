@@ -23,8 +23,8 @@ function [b, numBad]= create_spike_regs(b, all_suspects, spikePrefix)
 %
 %       b       = memolab_MRI_batch structure
 %
-%       numBad = a double vector which contains the number of bad
-%                timepoints flagged for each run
+%       numBad = a vector which contains the number of bad timepoints 
+%                flagged for each run
 %
 % See also: art_global_qa, memolab_batch_qa
 
@@ -53,7 +53,7 @@ for j = 1:length(b.runs)
     
     % write out list of bad timepoints
     filedir  = fullfile(b.dataDir, 'func');
-    filename = fullfile(filedir, [spikePrefix 'bad_timepoints' b.runs{j} '.txt']);
+    filename = fullfile(filedir, [spikePrefix 'bad_timepoints_' b.runs{j} '.txt']);
     fprintf('-- Writing out %s\n', filename);
     dlmwrite(filename, bad_timepoints, 'delimiter', '\t');
    
@@ -71,7 +71,7 @@ for j = 1:length(b.runs)
     allreg = [motion spikereg];
     
     % write out new rp regressors including spike regs
-    filename = fullfile(filedir, [spikePrefix 'spike_regs_rp' b.runs{j} '.txt']);
+    filename = fullfile(filedir, [spikePrefix 'spike_regs_rp_' b.runs{j} '.txt']);
     fprintf('-- Writing out %s\n\n', filename);
     dlmwrite(filename, allreg, 'delimiter', '\t');
     
