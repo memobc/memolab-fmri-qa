@@ -104,6 +104,15 @@ if runflag
         % art_suspects
         give_unique_filename('art_suspects.txt', b, r);
         
+        % artglobal*.jpg
+        
+        % figure out art global's file naming convention. Convention is
+        % artglobal_SUBJECTID_parentDirName.jpg.
+        fp_to_parentFolder   = fileparts(b.rundir(r).rp);
+        [~, parentDirName]   = fileparts(fp_to_parentFolder);
+        fn                   = ['artglobal_' b.curSubj '_' parentDirName '.jpg']; % artglobal's default filenaming convention
+        give_unique_filename(fn, b, r);
+        
     end
 end
 
@@ -132,6 +141,11 @@ function give_unique_filename(filename, b, rr)
     [~, FN, ext]   = fileparts(filename);
     og_file        = spm_select('FPListRec', b.dataDir, filename);
     og_dir         = fileparts(og_file);
+    if strcmp(FN(1:9), 'artglobal')
+       movefile(og_file, fullfile(og_dir, 'artglobal.jpg'))
+       FN      = 'artglobal';
+       og_file = fullfile(og_dir, 'artglobal.jpg'); 
+    end
     rename         = fullfile(og_dir, [FN '_' b.curSubj '_' b.runs{rr} ext]);
     fprintf('Renaming %s --> \n\t %s\n\n', og_file, rename)
     movefile(og_file, rename) % rename
